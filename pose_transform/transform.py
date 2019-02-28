@@ -22,6 +22,8 @@ import math
 ###############################################################################
 # Description d'une transformation
 ###############################################################################
+
+
 class Transform:
     matrix = None  # matrix de transfo
 
@@ -33,7 +35,11 @@ class Transform:
         if mat is None:
             self.matrix = np.identity(4)
             if quat is not None and pos is not None:
-                self.matrix[:3, :3] = quaternion.as_rotation_matrix(quat)
+                # (w, x, y, z)
+                quat = np.asarray(quat)
+                npquat = quaternion.quaternion(quat[0], quat[1],
+                                               quat[2], quat[3])
+                self.matrix[:3, :3] = quaternion.as_rotation_matrix(npquat)
                 self.matrix[:3, 3] = pos
         else:
             self.matrix = np.copy(mat)
@@ -109,9 +115,10 @@ class Transform:
     def projection(self, pt):
         u"""Transformation d'un point."""
         if (len(pt) == 3):
-            return self.matrix.dot(pt+[1])
+            return self.matrix.dot(pt + [1])
         else:
             return self.matrix.dot(pt)
+
 
 def rotation_matrix(axe, angle):
     u"""Génére une matrice de rotation depuis un axe ('x','y' ou 'z') et un angle."""
@@ -132,6 +139,7 @@ def rotation_matrix(axe, angle):
         matrix[1, 0] = math.sin(angle)
         matrix[1, 1] = math.cos(angle)
     return matrix
+
 
 def translation_matrix(tr):
     u"""Génére une matrice de translation depuis le vecteur tr."""
