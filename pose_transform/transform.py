@@ -25,7 +25,7 @@ import math
 
 
 class Transform:
-    matrix = None  # matrix de transfo
+    # self.matrix = None  # matrix de transfo
 
     # Constructeur
     def __init__(self, mat=None, quat=None, pos=None):
@@ -46,19 +46,6 @@ class Transform:
 
     def __str__(self):
         u"""Affichage de la transformation."""
-        # q = self.quaternion()
-        # angle = 2*math.acos(q.w)
-        # d = np.linalg.norm([q.x, q.y, q.z])
-        # if (abs(d) < 1e-10):
-        #     d = 1
-        # p = self.position()
-        # res = "|"
-        # res += str(p) + " "
-        # res += "(" + str(angle) + ", "
-        # res += "[" + str(q.x/d) + ", " + str(q.y/d) + ", " + str(q.z/d) + "]"
-        # res += ")"
-        # res += "|"
-        # return res
         return self.matrix.__str__()
 
     def __repr__(self):
@@ -68,7 +55,7 @@ class Transform:
     def quat_2_mat(self, quat, pos):
         u"""Conversion quaternion vers matrix."""
         self.matrix[:3, :3] = quaternion.as_rotation_matrix(quat)
-        self.matrix[:3, 3] = position
+        self.matrix[:3, 3] = pos
 
     def inverse(self):
         u"""Inverse de la transformation."""
@@ -80,11 +67,11 @@ class Transform:
 
     def __sub__(self, other):
         u"""Renvoie la transformation dans self du repère à l'origine de la transformation other."""
-        return self * ~other
+        return self.composition(~other)
 
     def __isub__(self, other):
         u"""Version 'inplace' de sub."""
-        self = self * ~other
+        self = self.composition(~other)
         return self
 
     def quaternion(self):
@@ -97,11 +84,11 @@ class Transform:
 
     def composition(self, tr):
         u"""Composition de transformations."""
-        return Transform(mat=self.matrix.dot(tr.matrix))
+        return Transform(mat=np.dot(self.matrix, tr.matrix))
 
     def __mul__(self, other):
         u"""Composition de la transformation de other dans self."""
-        return Transform(mat=self.matrix.dot(other.matrix))
+        return self.composition(other)
 
     def __imul__(self, other):
         u""""Version 'inplace' de mul."""
@@ -110,7 +97,7 @@ class Transform:
 
     def relative_transform(self, other):
         u"""Transformation de self dans le repère other."""
-        return ~other * self
+        return ~other.composition(self)
 
     def projection(self, pt):
         u"""Transformation d'un point."""

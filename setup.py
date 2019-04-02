@@ -8,7 +8,7 @@ with open('README.md', 'r') as fh:
 setup(
     name='pose_transform',
     packages=find_packages(),
-    version='0.2.0',
+    version='0.3.1',
     description='Mini-Library for handling 3D pose manipulation via'
                 ' Transformation matrices',
     author=u'Virgile Daugé & Sylvain Contassot-Vivier',
